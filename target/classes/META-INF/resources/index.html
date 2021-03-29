@@ -9,7 +9,7 @@
   <body>
     <div id="content">
       <h1>Travel Match</h1>
-      <form>
+      <form onsubmit="return results();">
             <p>Time of year:</p>
             <input type="radio" id="spring" name="season" value="spring">
             <label for="spring">Spring</label><br>
@@ -19,8 +19,17 @@
             <label for="fall">Fall</label><br>
             <input type="radio" id="winter" name="season" value="winter">
             <label for="winter">Winter</label>
-            <input type="submit" value="Submit">
+            <input id="submit" type="submit" value="Submit">
       </form>
+      <script>
+          function results(){
+              document.write("<p>Based On Your Answers You Should Visit</p>");
+              document.write("<h1>CANCUN</h1>");
+
+          }
+      </script>
+
+   
     </div>
   </body>
 </html>
