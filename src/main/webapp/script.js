@@ -18,6 +18,7 @@ var jsonPlacehold = '{ "questions" : [' +
 '{ "q":"Pick a TV show" , "options":["Emily in Paris", "Doctor Who", "Brooklyn 99", "Itaewon Class"] } ]}';
 var obj = JSON.parse(jsonPlacehold);
 var objIndex = 0;
+var responses = [];
 
 function onLoad(){
     const quiz = document.getElementById('quiz');
@@ -25,13 +26,15 @@ function onLoad(){
     for (a in obj.questions[0].options){
         // console.log(obj.questions[0].options[a])
         var button = createButton(obj.questions[0].options[a])
-        button.addEventListener("click", onClick)
+        button.addEventListener("click", function(){onClick(this);
+            });
         quiz.appendChild(button);
     }
 
 }
 
-function onClick(){
+function onClick(elm){
+    responses.push(elm.value);    
     objIndex = objIndex+1;
     // console.log(objIndex);
     clearElm("quiz");
@@ -41,19 +44,23 @@ function onClick(){
         // console.log(obj.questions[0].options[a])
         var button = createButton(obj.questions[objIndex].options[a]);
         if (objIndex==obj.questions.length-1){
-            button.addEventListener("click", goMatch);
+            button.addEventListener("click", function(){saveMatch(this);
+            });
         }
         else {
-            button.addEventListener("click", onClick);
+            button.addEventListener("click", function(){onClick(this);
+            });
         }
         quiz.appendChild(button);
     }
 }
 
-function goMatch(){
+function saveMatch(elm){
+    responses.push(elm.value);
     clearElm("quiz");
     const quiz = document.getElementById('quiz');
     quiz.appendChild(createParElement("Make redirect to destination match"));
+    quiz.appendChild(createParElement(responses.toString()));
 }
 
 /** Creates an <p> element containing text. */
