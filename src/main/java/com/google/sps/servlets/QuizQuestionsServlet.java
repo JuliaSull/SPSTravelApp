@@ -5,19 +5,18 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import com.google.gson.Gson;
 
-/** Handles requests sent to the /hello URL. Try running a server and navigating to /hello! */
+/** Handles requests sent to the /getQuizQuestions URL. Try running a server and navigating to /getQuizQuestions! */
 @WebServlet("/getQuizQuestions")
 public class QuizQuestionsServlet extends HttpServlet {
 
-  static final long serialVersionUID = 0;
+    static final long serialVersionUID = 0;
     class QuizQuestion {
-        HashMap<String, List<String>> quiz = new HashMap<>();
+        HashMap < String, List < String >> quiz = new HashMap < > ();
 
         public QuizQuestion() {
             quiz.put("Which of these would you most like to do?", List.of("Go on a hike in nature", "Take a trip downtown", "Go to a museum", "Take a day for relaxation"));
@@ -32,14 +31,9 @@ public class QuizQuestionsServlet extends HttpServlet {
     }
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        ArrayList<String> a = new ArrayList<String>();
-        a.add("Hike");
-        a.add("Swim");
-        a.add("Relax");
-
         QuizQuestion quest = new QuizQuestion();
 
-        // Convert the server stats to JSON
+        // Convert the quiz question to JSON
         String json = convertToJsonUsingGson(quest);
 
         // Send the JSON as the response
@@ -48,11 +42,9 @@ public class QuizQuestionsServlet extends HttpServlet {
     }
 
     /**
-    * Converts a ServerStats instance into a JSON string using the Gson library.
-    */
+     * Converts a QuizQuestions instance into a JSON string using the Gson library.
+     */
     private String convertToJsonUsingGson(QuizQuestion quest) {
-        Gson gson = new Gson();
-        String json = gson.toJson(quest);
-        return json;
+        return new Gson().toJson(quest);
     }
 }
