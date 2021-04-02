@@ -11,81 +11,74 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+let jsonPlacehold;
+let quizObject;
+let quizIndex = 0;
+let responses = [];
+const QUIZ_ELEMENT_ID = "quiz";
 
-var jsonPlacehold = '{ "questions" : [' +
-'{ "q":"How would you spend an afternoon?" , "options":["hiking mountains", "shopping crafts", "trying local eats", "visiting a museum"]},' +
-'{ "q":"What would you choose for breakfast?" , "options":["acai bowl", "waffles", "crossaints", "huevos rancheros", "bagels"] },' +
-'{ "q":"Pick a TV show" , "options":["Emily in Paris", "Doctor Who", "Brooklyn 99", "Itaewon Class"] } ]}';
-var obj = JSON.parse(jsonPlacehold);
-var objIndex = 0;
-var responses = [];
-
-function onLoad(){
-    const quiz = document.getElementById('quiz');
-    quiz.appendChild(createParElement(obj.questions[0].q));
-    for (a in obj.questions[0].options){
-        // console.log(obj.questions[0].options[a])
-        var button = createButton(obj.questions[0].options[a])
-        button.addEventListener("click", function(){onClick(this);
-            });
+function onLoad() {
+    jsonPlacehold = '{ "questions" : [' +
+        '{ "q":"How would you spend an afternoon?" , "options":["hiking mountains", "shopping crafts", "trying local eats", "visiting a museum"]},' +
+        '{ "q":"What would you choose for breakfast?" , "options":["acai bowl", "waffles", "crossaints", "huevos rancheros", "bagels"] },' +
+        '{ "q":"Pick a TV show" , "options":["Emily in Paris", "Doctor Who", "Brooklyn 99", "Itaewon Class"] } ]}';
+    quizObject = JSON.parse(jsonPlacehold);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    quiz.appendChild(createParagraphElement(quizObject.questions[0].q));
+    for (let a of quizObject.questions[0].options) {
+        let button = createButton(a);
+        button.addEventListener("click", function() {
+            onClick(this);
+        });
         quiz.appendChild(button);
     }
 
 }
 
-function onClick(elm){
-    responses.push(elm.value);    
-    objIndex = objIndex+1;
-    // console.log(objIndex);
-    clearElm("quiz");
-    const quiz = document.getElementById('quiz');
-    quiz.appendChild(createParElement(obj.questions[objIndex].q));
-    for (a in obj.questions[objIndex].options){
-        // console.log(obj.questions[0].options[a])
-        var button = createButton(obj.questions[objIndex].options[a]);
-        if (objIndex==obj.questions.length-1){
-            button.addEventListener("click", function(){saveMatch(this);
-            });
-        }
-        else {
-            button.addEventListener("click", function(){onClick(this);
-            });
-        }
-        quiz.appendChild(button);
-    }
-}
-
-function saveMatch(elm){
+function onClick(elm) {
     responses.push(elm.value);
-    clearElm("quiz");
-    const quiz = document.getElementById('quiz');
-    quiz.appendChild(createParElement("Make redirect to destination match"));
-    quiz.appendChild(createParElement(responses.toString()));
+    quizIndex = quizIndex + 1;
+    clearElm(QUIZ_ELEMENT_ID);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    quiz.appendChild(createParagraphElement(quizObject.questions[quizIndex].q));
+    for (let a of quizObject.questions[quizIndex].options) {
+        let button = createButton(a);
+        if (quizIndex == quizObject.questions.length - 1) {
+            button.addEventListener("click", function() {
+                saveMatch(this);
+            });
+        } else {
+            button.addEventListener("click", function() {
+                onClick(this);
+            });
+        }
+        quiz.appendChild(button);
+    }
+}
+
+function saveMatch(elm) {
+    responses.push(elm.value);
+    clearElm(QUIZ_ELEMENT_ID);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    quiz.appendChild(createParagraphElement("Make redirect to destination match"));
+    quiz.appendChild(createParagraphElement(responses.toString()));
 }
 
 /** Creates an <p> element containing text. */
-function createParElement(text) {
+function createParagraphElement(text) {
     const pElement = document.createElement('p');
     pElement.innerText = text;
     return pElement;
 }
 
-// function createOption(text) {
-//     var option = document.createElement('INPUT');
-//     option.setAttribute("type", "radio");    
-//     option.innerHTML = text;
-//     return button;
-// }
-
 function createButton(text) {
-    var button = document.createElement('INPUT');
-    button.setAttribute("type", "button");    
+    let button = document.createElement('INPUT');
+    button.setAttribute("type", "button");
     button.innerHTML = text;
-    button.setAttribute("value",text);
+    button.setAttribute("value", text);
     return button;
 }
 
-function clearElm(elementID)
-{
+function clearElm(elementID) {
     document.getElementById(elementID).innerHTML = "";
 }
