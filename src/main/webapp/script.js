@@ -19,12 +19,12 @@ const QUIZ_ELEMENT_ID = "quiz";
 
 function onLoad() {
     jsonPlacehold = '{ "questions" : [' +
-        '{ "q":"How would you spend an afternoon?" , "options":["hiking mountains", "shopping crafts", "trying local eats", "visiting a museum"]},' +
-        '{ "q":"What would you choose for breakfast?" , "options":["acai bowl", "waffles", "crossaints", "huevos rancheros", "bagels"] },' +
-        '{ "q":"Pick a TV show" , "options":["Emily in Paris", "Doctor Who", "Brooklyn 99", "Itaewon Class"] } ]}';
+        '{ "question":"How would you spend an afternoon?" , "options":["hiking mountains", "shopping crafts", "trying local eats", "visiting a museum"]},' +
+        '{ "question":"What would you choose for breakfast?" , "options":["acai bowl", "waffles", "crossaints", "huevos rancheros", "bagels"] },' +
+        '{ "question":"Pick a TV show" , "options":["Emily in Paris", "Doctor Who", "Brooklyn 99", "Itaewon Class"] } ]}';
     quizObject = JSON.parse(jsonPlacehold);
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement(quizObject.questions[0].q));
+    quiz.appendChild(createParagraphElement(quizObject.questions[0].question));
     for (let a of quizObject.questions[0].options) {
         let button = createButton(a);
         button.addEventListener("click", function() {
@@ -40,7 +40,7 @@ function onClick(elm) {
     quizIndex = quizIndex + 1;
     clearElm(QUIZ_ELEMENT_ID);
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement(quizObject.questions[quizIndex].q));
+    quiz.appendChild(createParagraphElement(quizObject.questions[quizIndex].question));
     for (let a of quizObject.questions[quizIndex].options) {
         let button = createButton(a);
         if (quizIndex == quizObject.questions.length - 1) {
