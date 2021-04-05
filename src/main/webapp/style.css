@@ -24,8 +24,8 @@ p {
     font-size:4em;
 }
 
-input[type=button] { 
-  width: 15%;  
+input[type=button] {
+  width: 15%; 
   height:7%;
   background-color: #bbdef0;
   border: none;
@@ -34,7 +34,7 @@ input[type=button] {
   font-size: 1.5em;
   margin: 2% 2.5%;
   cursor: pointer;
-  justify-content:center; 
+  justify-content:center;
 }
 
 #img {
