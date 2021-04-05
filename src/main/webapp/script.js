@@ -46,7 +46,7 @@ function onClick(elm) {
         let button = createButton(a);
         if (quizIndex == quizObject.questions.length - 1) {
             button.addEventListener("click", function() {
-                //saveMatch(this);
+                saveMatch(this);
                 userResult(this);
             });
         } else {
@@ -85,18 +85,16 @@ function clearElm(elementID) {
     document.getElementById(elementID).innerHTML = "";
 }
 
-function userResult(){
-   
+function userResult() {
     clearElm(QUIZ_ELEMENT_ID);
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement("Based On Your Results You Should visit..."));
-   
-    getHeader(this);
+    quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
+
+    displayResults(this);
 }
 
-function getHeader(){
+function displayResults() {
     var h = document.createElement("H3");
-    var t = document.createTextNode("Paris!");
-     h.appendChild(t);
+    h.appendChild(document.createTextNode("Paris!"));
     document.body.appendChild(h);
 }
