@@ -17,6 +17,7 @@ let quizIndex = 0;
 let responses = [];
 const QUIZ_ELEMENT_ID = "quiz";
 
+
 function onLoad() {
     jsonPlacehold = '{ "questions" : [' +
         '{ "question":"How would you spend an afternoon?" , "options":["hiking mountains", "shopping crafts", "trying local eats", "visiting a museum"]},' +
@@ -45,7 +46,8 @@ function onClick(elm) {
         let button = createButton(a);
         if (quizIndex == quizObject.questions.length - 1) {
             button.addEventListener("click", function() {
-                saveMatch(this);
+                //saveMatch(this);
+                userResult(this);
             });
         } else {
             button.addEventListener("click", function() {
@@ -81,4 +83,20 @@ function createButton(text) {
 
 function clearElm(elementID) {
     document.getElementById(elementID).innerHTML = "";
+}
+
+function userResult(){
+   
+    clearElm(QUIZ_ELEMENT_ID);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    quiz.appendChild(createParagraphElement("Based On Your Results You Should visit..."));
+   
+    getHeader(this);
+}
+
+function getHeader(){
+    var h = document.createElement("H3");
+    var t = document.createTextNode("Paris!");
+     h.appendChild(t);
+    document.body.appendChild(h);
 }
