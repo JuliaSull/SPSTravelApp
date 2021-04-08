@@ -17,22 +17,24 @@ let quizIndex = 0;
 let responses = [];
 const QUIZ_ELEMENT_ID = "quiz";
 
-function onLoad() {
-    jsonPlacehold = '{ "questions" : [' +
-        '{ "question":"How would you spend an afternoon?" , "options":["hiking mountains", "shopping crafts", "trying local eats", "visiting a museum"]},' +
-        '{ "question":"What would you choose for breakfast?" , "options":["acai bowl", "waffles", "crossaints", "huevos rancheros", "bagels"] },' +
-        '{ "question":"Pick a TV show" , "options":["Emily in Paris", "Doctor Who", "Brooklyn 99", "Itaewon Class"] } ]}';
-    quizObject = JSON.parse(jsonPlacehold);
+
+async function onLoad() {    
+    quizObject = await fetch('/getQuizQuestions').then(a=>a.json());
+    quizKeys = Object.keys(quizObject.quiz);
+    console.log(quizObject);
+
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement(quizObject.questions[0].question));
-    for (let a of quizObject.questions[0].options) {
+    const question = quizKeys[0];
+
+    quiz.appendChild(createParagraphElement(question));
+    for (let a of quizObject.quiz[question]) {
         let button = createButton(a);
+        button.classList.add("nextButton");
         button.addEventListener("click", function() {
             onClick(this);
         });
         quiz.appendChild(button);
     }
-
 }
 
 function onClick(elm) {
