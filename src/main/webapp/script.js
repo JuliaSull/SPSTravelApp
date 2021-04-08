@@ -41,12 +41,12 @@ async function onLoad() {
     quiz.appendChild(createParagraphElement(question));
     for (let a of quizObject.quiz[question]) {
         let button = createButton(a);
+        button.classList.add("nextButton");
         button.addEventListener("click", function() {
             onClick(this);
         });
         quiz.appendChild(button);
     }
-
 }
 
 function onClick(elm) {
@@ -60,9 +60,11 @@ function onClick(elm) {
     quiz.appendChild(createParagraphElement(question));
     for (let a of quizObject.quiz[question]) {
         let button = createButton(a);
+        button.classList.add("nextButton");
         if (quizIndex == quizKeys.length - 1) {            
             button.addEventListener("click", function() {
                 saveMatch(this);
+                userResult(this);
             });
         } else {
             button.addEventListener("click", function() {
@@ -80,7 +82,6 @@ function saveMatch(elm) {
     quiz.appendChild(createParagraphElement("Make redirect to destination match"));
     quiz.appendChild(createParagraphElement(responses.toString()));
 }
-
 /** Creates an <p> element containing text. */
 function createParagraphElement(text) {
     const pElement = document.createElement('p');
@@ -98,4 +99,17 @@ function createButton(text) {
 
 function clearElm(elementID) {
     document.getElementById(elementID).innerHTML = "";
+}
+
+function userResult() {
+    clearElm(QUIZ_ELEMENT_ID);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
+    displayResults(this);
+}
+
+function displayResults() {
+    var h = document.createElement("H3");
+    h.appendChild(document.createTextNode("Paris!"));
+    document.body.appendChild(h);
 }
