@@ -87,6 +87,7 @@ function clearElm(elementID) {
 
 function userResult() {
     clearElm(QUIZ_ELEMENT_ID);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
     quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
     displayResults(this);
 }
@@ -99,16 +100,7 @@ function displayResults() {
         '{ "Place":"Cape Town" , "Currency":"South African Rand","Language":"Afrikaans","Price":"$","Food":["Fish and Chips", "Game Meat", "Gatsby", "Bunny Chow","Bobotie", "Biltong and Droëwors", "Malva Pudding" , "Koeksister"] } ]}';
     resultObject = JSON.parse(jsonPlaces);
     var h = document.createElement("H3");
-    let place = Math.floor(Math.random() * 4);
-    if(place==0){
-        i=0;
-    }else if(place==1){
-        i=1;
-    }else if(place==2){
-        i=2;
-    }else if(place==3){
-        i=3;
-    }
+    let i = Math.floor(Math.random() * 4);
     h.appendChild(document.createTextNode(resultObject.Places[i].Place));
     document.body.appendChild(h);
     document.body.appendChild(createParagraphElement("Currency: "+resultObject.Places[i].Currency));
