@@ -13,20 +13,34 @@
 // limitations under the License.
 let jsonPlacehold;
 let quizObject;
+let quizKeys;
 let quizIndex = 0;
 let responses = [];
 const QUIZ_ELEMENT_ID = "quiz";
 let resultObject;
 
-function onLoad() {
-    jsonPlacehold = '{ "questions" : [' +
-        '{ "question":"How would you spend an afternoon?" , "options":["hiking mountains", "shopping crafts", "trying local eats", "visiting a museum"]},' +
-        '{ "question":"What would you choose for breakfast?" , "options":["acai bowl", "waffles", "crossaints", "huevos rancheros", "bagels"] },' +
-        '{ "question":"Pick a TV show" , "options":["Emily in Paris", "Doctor Who", "Brooklyn 99", "Itaewon Class"] } ]}';
-    quizObject = JSON.parse(jsonPlacehold);
+// What should be fetched from /getQuizQuestion
+// {
+// 	"quiz": {
+// 		"How much are you willing to spend?": ["$$$$", "$$$", "$$", "$"],
+// 		"What is your favorite food?": ["Fruit", "Burgers", "Wraps", "Steak"],
+// 		"What do you value most?": ["Learning new thigs", "Physical activity", "Beautiful scenery", "New experiences"],
+// 		"Which of these would you most like to do?": ["Go on a hike in nature", "Take a trip downtown", "Go to a museum", "Take a day for relaxation"],
+// 		"How active do you like to be?": ["Very much", "Much", "Not much", "Not at all"],
+// 		"Will you bring children? If so, how many?": ["No", "1", "2-4", "4+"],
+// 		"How long will your trip be?": ["2+ weeks", "1 week", "Less than a week", "One day"]
+// 	}
+// }
+
+async function onLoad() {    
+    quizObject = await fetch('/getQuizQuestions').then(a=>a.json());
+    quizKeys = Object.keys(quizObject.quiz);
+    
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement(quizObject.questions[0].question));
-    for (let a of quizObject.questions[0].options) {
+    const question = quizKeys[0];
+
+    quiz.appendChild(createParagraphElement(question));
+    for (let a of quizObject.quiz[question]) {
         let button = createButton(a);
         button.classList.add("nextButton");
         button.addEventListener("click", function() {
@@ -40,12 +54,15 @@ function onClick(elm) {
     responses.push(elm.value);
     quizIndex = quizIndex + 1;
     clearElm(QUIZ_ELEMENT_ID);
+
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement(quizObject.questions[quizIndex].question));
-    for (let a of quizObject.questions[quizIndex].options) {
+    const question = quizKeys[quizIndex];
+
+    quiz.appendChild(createParagraphElement(question));
+    for (let a of quizObject.quiz[question]) {
         let button = createButton(a);
         button.classList.add("nextButton");
-        if (quizIndex == quizObject.questions.length - 1) {
+        if (quizIndex == quizKeys.length - 1) {            
             button.addEventListener("click", function() {
                 saveMatch(this);
                 userResult(this);
