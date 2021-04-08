@@ -17,6 +17,7 @@ let quizKeys;
 let quizIndex = 0;
 let responses = [];
 const QUIZ_ELEMENT_ID = "quiz";
+let resultObject;
 
 // What should be fetched from /getQuizQuestion
 // {
@@ -109,7 +110,23 @@ function userResult() {
 }
 
 function displayResults() {
+    jsonPlaces = '{ "Places" : [' +
+   '{ "Place":"Paris" , "Currency":"Euro","Language":"Parisian French","Price":"$$$","Food":["Caramels", "Baguette", "Pain Au chocolat", "Pastries", "Chocolate", "Macarons", "Cheese from Laurent Dubois", "Crème Brûlée ", "Éclair", "Croissants" ]},' +
+        '{ "Place":"New York" , "Currency":"US Dollar","Language":"English","Price":"$$$","Food":["Pizza", "Bagels", "Burgers", "Sandwiches", "Ramen", "Food Trucks", "Cheesecake" ]},' +
+        '{ "Place":"Hawaii" , "Currency":"US Dollar","Language":"English, Creole, and Hawaiian Pidgin","Price":"$$","Food":["All-Natural Shave Ice", "Saimin", "Poke", "Luau Stew", "Manapua", "Fish Tacos", "Huli Huli Chicken", "Loco Moco", "Malasadas"]},' +
+        '{ "Place":"Cape Town" , "Currency":"South African Rand","Language":"Afrikaans","Price":"$","Food":["Fish and Chips", "Game Meat", "Gatsby", "Bunny Chow","Bobotie", "Biltong and Droëwors", "Malva Pudding" , "Koeksister"] } ]}';
+    resultObject = JSON.parse(jsonPlaces);
     var h = document.createElement("H3");
-    h.appendChild(document.createTextNode("Paris!"));
+    let i = Math.floor(Math.random() * 4);
+    h.appendChild(document.createTextNode(resultObject.Places[i].Place));
     document.body.appendChild(h);
+    document.body.appendChild(createParagraphElement("Currency: "+resultObject.Places[i].Currency));
+    document.body.appendChild(createParagraphElement("Language: "+resultObject.Places[i].Language));
+    document.body.appendChild(createParagraphElement("Price: "+resultObject.Places[i].Price));
+    document.body.appendChild(createParagraphElement("Food to try: ")); 
+    for (var j = 0; j < resultObject.Places[i].Food.length; j++) {
+        document.body.appendChild(createParagraphElement(resultObject.Places[i].Food[j]));
+    
+    }
+    
 }
