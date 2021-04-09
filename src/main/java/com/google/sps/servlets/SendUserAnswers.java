@@ -24,6 +24,7 @@ import com.google.cloud.datastore.ListValue;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,10 +34,15 @@ import javax.servlet.http.HttpServletResponse;
 /** Servlet responsible for creating new tasks. */
 @WebServlet("/sendUserAnswers")
 public class SendUserAnswers extends HttpServlet {
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     
-    List<String> answers = response;
+  static final long serialVersionUID = 0;
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    
+    
+    String answers = request.getParameter("responses");
+   
     Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     ListValue.Builder builder = ListValue.newBuilder();

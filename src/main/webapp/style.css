@@ -1,0 +1,47 @@
+
+#content {
+  margin-left: auto;
+  margin-right: auto;
+  size:80%;
+}
+
+h1 {
+  background-color: #006161;
+  padding: 5%;
+  text-align: center;
+  font-family: Helvetica;
+  color: white;
+  font-size:10em;
+}
+
+h3 {
+  text-align: center;
+  font-family: Helvetica;
+  font-size:7em;
+}
+
+p {
+  text-align: center;
+    font-size:4em;
+}
+
+.nextButton{
+  width: 15%;
+  height:7%;
+  background-color: #bbdef0;
+  border: none;
+  text-align: center;
+  display: inline-block;
+  font-size: 1.5em;
+  margin: 2% 2.5%;
+  cursor: pointer;
+  justify-content:center;
+}
+
+#img {
+  margin:auto;
+  border: 2% solid #ddd;
+  border-radius: 4%;
+  padding: 5%;
+  width: 30%;
+}
