@@ -12,6 +12,7 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 
+import com.google.gson.Gson;
 
 /**
  * Handles requests sent to the /getQuizQuestions URL. Try running a server and
@@ -30,8 +31,16 @@ public class QuizQuestionsServlet extends HttpServlet {
         Query<Entity> query = Query.newEntityQueryBuilder().setKind("Questions").build();
         QueryResults<Entity> questions = datastore.run(query);
 
+        String json = convertToJsonUsingGson(questions);
+        
         // Send the JSON as the response
         response.setContentType("application/json;");
-        response.getWriter().println(questions);
+        response.getWriter().println(json);
+    }
+
+    private String convertToJsonUsingGson(QueryResults<Entity> q) {
+        Gson gson = new Gson();
+        String json = gson.toJson(q);
+        return json;
     }
 }

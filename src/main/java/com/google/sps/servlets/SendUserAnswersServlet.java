@@ -17,14 +17,10 @@ package com.google.sps.servlets;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
-import com.google.cloud.datastore.FullEntity;
 import com.google.cloud.datastore.Key;
-import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.ListValue;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Servlet responsible for creating new tasks. */
 @WebServlet("/sendUserAnswers")
-public class SendUserAnswers extends HttpServlet {
+public class SendUserAnswersServlet extends HttpServlet {
     
   static final long serialVersionUID = 0;
 
@@ -46,9 +42,9 @@ public class SendUserAnswers extends HttpServlet {
     Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     ListValue.Builder builder = ListValue.newBuilder();
-    for (String str : answers) {
-        builder.addValue(str);
-    }
+    //for (String str : answers) {
+        builder.addValue(answers);
+    //}
         // Save to datastore
     Key taskKey = datastore.newKeyFactory()
         .setKind("UserAnswers")
