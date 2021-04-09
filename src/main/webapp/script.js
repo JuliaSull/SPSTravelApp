@@ -110,7 +110,6 @@ async function saveMatch(elm) {
 //   console.error('Error:', error);
 // });
 }
-
 /** Creates an <p> element containing text. */
 function createParagraphElement(text) {
     const pElement = document.createElement('p');
