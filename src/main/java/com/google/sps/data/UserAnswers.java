@@ -14,4 +14,12 @@ public final class UserAnswers {
     this.id = id;
     this.allAnswers = allAnswers;
   }
+
+  public List<Value<String>>getAllAnswers() {
+    return this.allAnswers;
+  }
+
+  public long getId() {
+      return this.id;
+  }
 }
