@@ -10,12 +10,9 @@ import com.google.sps.data.UserAnswers;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
-import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.Value;
-import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
-
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,23 +28,19 @@ import com.google.gson.Gson;
 public class DestinationInfoServlet extends HttpServlet {
 
     static final long serialVersionUID = 0;
-    private KeyFactory keyFactory;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        
-        String userID = request.getParameter("userID");
+        // get userAnswers from datastore and match them with a destination
 
-        // get userAnswers from datastore
         Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-        Query<Entity> query = Query.newEntityQueryBuilder()
-        .setKind("UserAnswers")
-        .setFilter(PropertyFilter.gt("__key__", keyFactory.newKey(userID))).build();
+        Query<Entity> query = Query.newEntityQueryBuilder().setKind("UserAnswers").build();
         QueryResults<Entity> results = datastore.run(query);
 
         List<UserAnswers> userAnswers = new ArrayList<>();
-        if(results.hasNext()) {
+        while (results.hasNext()) {
             Entity entity = results.next();
+
             long id = entity.getKey().getId();
             List<Value<String>> allAnswers = entity.getList("AllAnswers");
 
@@ -55,44 +48,8 @@ public class DestinationInfoServlet extends HttpServlet {
             userAnswers.add(answer);
         }
 
-
-        // get destination info from datastore
-        Query<Entity> destinationQuery = Query.newEntityQueryBuilder().setKind("Destinations").build();
-        QueryResults<Entity> destinationResults = datastore.run(destinationQuery);
-
-        List<Destination> destinations = new ArrayList<>();
-        while (destinationResults.hasNext()) {
-            Entity entity = destinationResults.next();
-
-            String name = entity.getString("name");
-            String overallExpense = entity.getString("overallExpense");
-            String type = entity.getString("type");
-            List<Value<String>> keywords = entity.getList("keywords");
-
-            Destination destination = new Destination(name,overallExpense,type,keywords);
-            destinations.add(destination);
-        }
-
-        boolean found = false;
-        // default hard-coded destination in case no destination is found
-        Destination newDestination = new Destination("Hawaii", "$$$", "beach");
-
-        //match responses with destination
-        for (UserAnswers answers : userAnswers) {
-            List<Value<String>> answerKeywords = answers.getAllAnswers();
-            for(Destination d : destinations) {
-                List<Value<String>> destinationKeywords = d.getKeywords();
-                for(Value<String> keyword : answerKeywords) {
-                    if(destinationKeywords.contains(keyword)) {
-                        newDestination = d;
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) break;
-            }
-            if (found) break;
-        }
+        // Hard-coded destination info
+        Destination newDestination = new Destination("Hawaii","$$$","beach");
 
         // Convert the server stats to JSON
         String json = convertToJsonUsingGson(newDestination);
