@@ -46,7 +46,8 @@
       <version>${jetty.version}</version>
     </dependency>
 
-    <!-- Datastore -->
+
+    <!--Datastore -->
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-datastore</artifactId>
