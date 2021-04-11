@@ -18,6 +18,7 @@ let quizIndex = 0;
 let responses = [];
 const QUIZ_ELEMENT_ID = "quiz";
 let resultObject;
+let userID;
 
 // What should be fetched from /getQuizQuestion
 // {
@@ -76,12 +77,38 @@ function onClick(elm) {
     }
 }
 
-function saveMatch(elm) {
+async function saveMatch(elm) {
     responses.push(elm.value);
+    userID = create_UUID();
     clearElm(QUIZ_ELEMENT_ID);
-    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement("Make redirect to destination match"));
-    quiz.appendChild(createParagraphElement(responses.toString()));
+    const form = document.createElement('form');
+    form.method = "post";
+    form.action = "/sendUserAnswers";
+
+      const hiddenField = document.createElement('input');
+      hiddenField.type = 'hidden';
+      hiddenField.name = "responses";
+      hiddenField.value = JSON.stringify(responses);
+      hiddenField.value = userID;
+
+      form.appendChild(hiddenField);
+
+    document.body.appendChild(form);
+    form.submit();
+
+//     answersObject = await fetch('/sendUserAnswers',{
+//   method: 'POST', // or 'PUT'
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify(responses),
+// }).then(response => response.json())
+// .then(data => {
+//   console.log('Success:', data);
+// })
+// .catch((error) => {
+//   console.error('Error:', error);
+// });
 }
 /** Creates an <p> element containing text. */
 function createParagraphElement(text) {
@@ -102,11 +129,23 @@ function clearElm(elementID) {
     document.getElementById(elementID).innerHTML = "";
 }
 
+
+
 function userResult() {
     clearElm(QUIZ_ELEMENT_ID);
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
     quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
     displayResults(this);
+}
+
+function create_UUID(){
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
 }
 
 function displayResults() {
