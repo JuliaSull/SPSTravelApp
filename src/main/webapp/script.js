@@ -35,14 +35,13 @@ let userID;
 
 async function onLoad() {    
     quizObject = await fetch('/getQuizQuestions').then(a=>a.json());
-    quizKeys = Object.keys(quizObject.quiz);
-    
-    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    const question = quizKeys[0];
 
-    quiz.appendChild(createParagraphElement(question));
-    for (let a of quizObject.quiz[question]) {
-        let button = createButton(a);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    const question = quizObject[0];
+
+    quiz.appendChild(createParagraphElement(question.question));
+    for (let answer of question.answers) {
+        let button = createButton(answer);
         button.classList.add("nextButton");
         button.addEventListener("click", function() {
             onClick(this);
@@ -85,15 +84,16 @@ async function saveMatch(elm) {
     form.method = "post";
     form.action = "/sendUserAnswers";
 
-      const hiddenField = document.createElement('input');
-      hiddenField.type = 'hidden';
-      hiddenField.name = "responses";
-      hiddenField.value = JSON.stringify(responses);
-      hiddenField.value = userID;
+    const hiddenField = document.createElement('input');
+    hiddenField.type = 'hidden';
+    hiddenField.name = "responses";
+    hiddenField.value = JSON.stringify(responses);
+    hiddenField.value = userID;
 
-      form.appendChild(hiddenField);
+    form.appendChild(hiddenField);
 
     document.body.appendChild(form);
+    alert("Sent the stuff");
     form.submit();
 
 //     answersObject = await fetch('/sendUserAnswers',{

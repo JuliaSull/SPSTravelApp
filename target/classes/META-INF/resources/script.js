@@ -13,39 +13,59 @@
 // limitations under the License.
 let jsonPlacehold;
 let quizObject;
+let quizKeys;
 let quizIndex = 0;
 let responses = [];
 const QUIZ_ELEMENT_ID = "quiz";
+let resultObject;
+let userID;
 
-function onLoad() {
-    jsonPlacehold = '{ "questions" : [' +
-        '{ "question":"How would you spend an afternoon?" , "options":["hiking mountains", "shopping crafts", "trying local eats", "visiting a museum"]},' +
-        '{ "question":"What would you choose for breakfast?" , "options":["acai bowl", "waffles", "crossaints", "huevos rancheros", "bagels"] },' +
-        '{ "question":"Pick a TV show" , "options":["Emily in Paris", "Doctor Who", "Brooklyn 99", "Itaewon Class"] } ]}';
-    quizObject = JSON.parse(jsonPlacehold);
+// What should be fetched from /getQuizQuestion
+// {
+// 	"quiz": {
+// 		"How much are you willing to spend?": ["$$$$", "$$$", "$$", "$"],
+// 		"What is your favorite food?": ["Fruit", "Burgers", "Wraps", "Steak"],
+// 		"What do you value most?": ["Learning new thigs", "Physical activity", "Beautiful scenery", "New experiences"],
+// 		"Which of these would you most like to do?": ["Go on a hike in nature", "Take a trip downtown", "Go to a museum", "Take a day for relaxation"],
+// 		"How active do you like to be?": ["Very much", "Much", "Not much", "Not at all"],
+// 		"Will you bring children? If so, how many?": ["No", "1", "2-4", "4+"],
+// 		"How long will your trip be?": ["2+ weeks", "1 week", "Less than a week", "One day"]
+// 	}
+// }
+
+async function onLoad() {    
+    quizObject = await fetch('/getQuizQuestions').then(a=>a.json());
+
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement(quizObject.questions[0].question));
-    for (let a of quizObject.questions[0].options) {
-        let button = createButton(a);
+    const question = quizObject[0];
+
+    quiz.appendChild(createParagraphElement(question.question));
+    for (let answer of question.answers) {
+        let button = createButton(answer);
+        button.classList.add("nextButton");
         button.addEventListener("click", function() {
             onClick(this);
         });
         quiz.appendChild(button);
     }
-
 }
 
 function onClick(elm) {
     responses.push(elm.value);
     quizIndex = quizIndex + 1;
     clearElm(QUIZ_ELEMENT_ID);
+
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement(quizObject.questions[quizIndex].question));
-    for (let a of quizObject.questions[quizIndex].options) {
+    const question = quizKeys[quizIndex];
+
+    quiz.appendChild(createParagraphElement(question));
+    for (let a of quizObject.quiz[question]) {
         let button = createButton(a);
-        if (quizIndex == quizObject.questions.length - 1) {
+        button.classList.add("nextButton");
+        if (quizIndex == quizKeys.length - 1) {            
             button.addEventListener("click", function() {
                 saveMatch(this);
+                userResult(this);
             });
         } else {
             button.addEventListener("click", function() {
@@ -56,14 +76,40 @@ function onClick(elm) {
     }
 }
 
-function saveMatch(elm) {
+async function saveMatch(elm) {
     responses.push(elm.value);
+    userID = create_UUID();
     clearElm(QUIZ_ELEMENT_ID);
-    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement("Make redirect to destination match"));
-    quiz.appendChild(createParagraphElement(responses.toString()));
-}
+    const form = document.createElement('form');
+    form.method = "post";
+    form.action = "/sendUserAnswers";
 
+    const hiddenField = document.createElement('input');
+    hiddenField.type = 'hidden';
+    hiddenField.name = "responses";
+    hiddenField.value = JSON.stringify(responses);
+    hiddenField.value = userID;
+
+    form.appendChild(hiddenField);
+
+    document.body.appendChild(form);
+    alert("Sent the stuff");
+    form.submit();
+
+//     answersObject = await fetch('/sendUserAnswers',{
+//   method: 'POST', // or 'PUT'
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify(responses),
+// }).then(response => response.json())
+// .then(data => {
+//   console.log('Success:', data);
+// })
+// .catch((error) => {
+//   console.error('Error:', error);
+// });
+}
 /** Creates an <p> element containing text. */
 function createParagraphElement(text) {
     const pElement = document.createElement('p');
@@ -81,4 +127,45 @@ function createButton(text) {
 
 function clearElm(elementID) {
     document.getElementById(elementID).innerHTML = "";
+}
+
+
+
+function userResult() {
+    clearElm(QUIZ_ELEMENT_ID);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
+    displayResults(this);
+}
+
+function create_UUID(){
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+}
+
+function displayResults() {
+    jsonPlaces = '{ "Places" : [' +
+   '{ "Place":"Paris" , "Currency":"Euro","Language":"Parisian French","Price":"$$$","Food":["Caramels", "Baguette", "Pain Au chocolat", "Pastries", "Chocolate", "Macarons", "Cheese from Laurent Dubois", "Crème Brûlée ", "Éclair", "Croissants" ]},' +
+        '{ "Place":"New York" , "Currency":"US Dollar","Language":"English","Price":"$$$","Food":["Pizza", "Bagels", "Burgers", "Sandwiches", "Ramen", "Food Trucks", "Cheesecake" ]},' +
+        '{ "Place":"Hawaii" , "Currency":"US Dollar","Language":"English, Creole, and Hawaiian Pidgin","Price":"$$","Food":["All-Natural Shave Ice", "Saimin", "Poke", "Luau Stew", "Manapua", "Fish Tacos", "Huli Huli Chicken", "Loco Moco", "Malasadas"]},' +
+        '{ "Place":"Cape Town" , "Currency":"South African Rand","Language":"Afrikaans","Price":"$","Food":["Fish and Chips", "Game Meat", "Gatsby", "Bunny Chow","Bobotie", "Biltong and Droëwors", "Malva Pudding" , "Koeksister"] } ]}';
+    resultObject = JSON.parse(jsonPlaces);
+    var h = document.createElement("H3");
+    let i = Math.floor(Math.random() * 4);
+    h.appendChild(document.createTextNode(resultObject.Places[i].Place));
+    document.body.appendChild(h);
+    document.body.appendChild(createParagraphElement("Currency: "+resultObject.Places[i].Currency));
+    document.body.appendChild(createParagraphElement("Language: "+resultObject.Places[i].Language));
+    document.body.appendChild(createParagraphElement("Price: "+resultObject.Places[i].Price));
+    document.body.appendChild(createParagraphElement("Food to try: ")); 
+    for (var j = 0; j < resultObject.Places[i].Food.length; j++) {
+        document.body.appendChild(createParagraphElement(resultObject.Places[i].Food[j]));
+    
+    }
+    
 }
