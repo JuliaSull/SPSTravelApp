@@ -42,28 +42,23 @@ public class SendUserAnswersServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        
         String answers = request.getParameter("responses");
-        System.err.println(answers);
-        // final JSONObject obj = new JSONObject(answers);
-        // System.err.println("yo");
-        // final JSONArray data = obj.getJSONArray("responses");
-        // System.err.println("yo");
-        // ArrayList<String> list = new ArrayList<>();
+        String userId = request.getParameter("userId");
+
+        final JSONArray data = new JSONObject(answers).getJSONArray("responses");
+        ArrayList<String> userAnswersList = new ArrayList<>();
         Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
         ListValue.Builder builder = ListValue.newBuilder();
-        System.err.println("yo");
         if (data != null) { 
             for (int i=0;i<data.length();i++){ 
-                list.add(data.getString(i));
+                userAnswersList.add(data.getString(i));
                 builder.addValue(data.getString(i));
             } 
         } 
-        System.err.println("yo");
 
         // Save to datastore
-        Key taskKey = datastore.newKeyFactory().setKind("UserAnswers").newKey(request.getParameter("userId"));
+        Key taskKey = datastore.newKeyFactory().setKind("UserAnswers").newKey(userId);
         Entity toSave = Entity.newBuilder(taskKey).set("AllAnswers", builder.build()).build();
 
         datastore.put(toSave);
