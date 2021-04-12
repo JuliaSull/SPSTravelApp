@@ -21,39 +21,51 @@ import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.ListValue;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+
+import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Enumeration;
 
 /** Servlet responsible for creating new tasks. */
 @WebServlet("/sendUserAnswers")
 @MultipartConfig
 public class SendUserAnswersServlet extends HttpServlet {
-    
-  static final long serialVersionUID = 0;
 
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
-    String answers = request.getParameter("responses");
-    
-    System.err.println(answers);
-    System.err.println(request.getParameter("userId"));
-    Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+    static final long serialVersionUID = 0;
 
-    ListValue.Builder builder = ListValue.newBuilder();
-    //for (String str : answers) {
-        builder.addValue(answers);
-    //}
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        
+        String answers = request.getParameter("responses");
+        System.err.println(answers);
+        // final JSONObject obj = new JSONObject(answers);
+        // System.err.println("yo");
+        // final JSONArray data = obj.getJSONArray("responses");
+        // System.err.println("yo");
+        // ArrayList<String> list = new ArrayList<>();
+        Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+
+        ListValue.Builder builder = ListValue.newBuilder();
+        System.err.println("yo");
+        if (data != null) { 
+            for (int i=0;i<data.length();i++){ 
+                list.add(data.getString(i));
+                builder.addValue(data.getString(i));
+            } 
+        } 
+        System.err.println("yo");
+
         // Save to datastore
-    Key taskKey = datastore.newKeyFactory()
-        .setKind("UserAnswers")
-        .newKey(request.getParameter("userId"));
-    Entity toSave = Entity.newBuilder(taskKey).set("AllAnswers", builder.build()).build();
-       
-    datastore.put(toSave);
-  }
+        Key taskKey = datastore.newKeyFactory().setKind("UserAnswers").newKey(request.getParameter("userId"));
+        Entity toSave = Entity.newBuilder(taskKey).set("AllAnswers", builder.build()).build();
+
+        datastore.put(toSave);
+    }
 }
