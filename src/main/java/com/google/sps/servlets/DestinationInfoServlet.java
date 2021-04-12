@@ -36,34 +36,37 @@ public class DestinationInfoServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
         String userID = request.getParameter("userId");
-        System.err.println("/getDestinationInfo:" + userID);
 
         // get userAnswers from datastore
         Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
         Query<Entity> query = Query.newEntityQueryBuilder()
-        .setKind("UserAnswers").build();
+          .setKind("UserAnswers").build();
         QueryResults<Entity> results = datastore.run(query);
 
+        boolean didMatch = false;
         List<UserAnswers> userAnswers = new ArrayList<>();
         while(results.hasNext()) {
-            System.err.println("next");
             Entity entity = results.next();
-
-            System.err.println("key " + entity.getKey().getName());
-            System.err.println("user id " + userID);
-            System.err.println(userID);
             
-            if(entity.getKey().getName().equals(userID)) {
-                System.err.println("match");
+            if (entity.getKey().getName().equals(userID)) {
                 List<Value<String>> allAnswers = entity.getList("AllAnswers");
                 UserAnswers answer = new UserAnswers(allAnswers);
                 userAnswers.add(answer);
-                System.err.println("final");
+                didMatch = true;
                 break;
             }
-            
         }
 
+        if (!didMatch) {
+          System.err.println("It did not match");
+            // Convert the server stats to JSON
+          String json = convertToJsonUsingGson(new Destination("Hawaii", "$$$", "beach", "English","U.S. Dollar"));
+
+          // Send the JSON as the response
+          response.setContentType("application/json;");
+          response.getWriter().println(json);
+          return;
+        }
 
         // get destination info from datastore
         Query<Entity> destinationQuery = Query.newEntityQueryBuilder().setKind("Destinations").build();

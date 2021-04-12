@@ -40,8 +40,6 @@ public class SendUserAnswersServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
     String answers = request.getParameter("responses");
     
-    System.err.println(answers);
-    System.err.println(request.getParameter("userId"));
     Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     ListValue.Builder builder = ListValue.newBuilder();
