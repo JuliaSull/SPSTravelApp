@@ -2,6 +2,7 @@ package com.google.sps.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.google.sps.data.Destination;
@@ -16,6 +17,7 @@ import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.Value;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,38 +25,48 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-/**
- * Handles requests sent to the /hello URL. Try running a server and navigating
- * to /hello!
- */
+
 @WebServlet("/getDestinationInfo")
+@MultipartConfig
 public class DestinationInfoServlet extends HttpServlet {
 
     static final long serialVersionUID = 0;
-    private KeyFactory keyFactory;
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
-        String userID = request.getParameter("userID");
+        String userID = request.getParameter("userId");
 
         // get userAnswers from datastore
         Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
         Query<Entity> query = Query.newEntityQueryBuilder()
-        .setKind("UserAnswers")
-        .setFilter(PropertyFilter.gt("__key__", keyFactory.newKey(userID))).build();
+          .setKind("UserAnswers").build();
         QueryResults<Entity> results = datastore.run(query);
 
+        boolean didMatch = false;
         List<UserAnswers> userAnswers = new ArrayList<>();
-        if(results.hasNext()) {
+        while(results.hasNext()) {
             Entity entity = results.next();
-            long id = entity.getKey().getId();
-            List<Value<String>> allAnswers = entity.getList("AllAnswers");
-
-            UserAnswers answer = new UserAnswers(id, allAnswers);
-            userAnswers.add(answer);
+            
+            if (entity.getKey().getName().equals(userID)) {
+                List<Value<String>> allAnswers = entity.getList("AllAnswers");
+                UserAnswers answer = new UserAnswers(allAnswers);
+                userAnswers.add(answer);
+                didMatch = true;
+                break;
+            }
         }
 
+        if (!didMatch) {
+          System.err.println("It did not match");
+            // Convert the server stats to JSON
+          String json = convertToJsonUsingGson(new Destination("Hawaii", "$$$", "beach", "English","U.S. Dollar"));
+
+          // Send the JSON as the response
+          response.setContentType("application/json;");
+          response.getWriter().println(json);
+          return;
+        }
 
         // get destination info from datastore
         Query<Entity> destinationQuery = Query.newEntityQueryBuilder().setKind("Destinations").build();
@@ -67,33 +79,31 @@ public class DestinationInfoServlet extends HttpServlet {
             String name = entity.getString("name");
             String overallExpense = entity.getString("overallExpense");
             String type = entity.getString("type");
+            String language = entity.getString("language");
+            String currency = entity.getString("currency");
             List<Value<String>> keywords = entity.getList("keywords");
+            List<Value<String>> food = entity.getList("food");
 
-            Destination destination = new Destination(name,overallExpense,type,keywords);
+            Destination destination = new Destination(name,overallExpense,type,language,currency,keywords,food);
             destinations.add(destination);
         }
 
-        boolean found = false;
         // default hard-coded destination in case no destination is found
-        Destination newDestination = new Destination("Hawaii", "$$$", "beach");
+        Destination newDestination = new Destination("Hawaii", "$$$", "beach", "English","U.S. Dollar");
 
-        //match responses with destination
-        for (UserAnswers answers : userAnswers) {
-            List<Value<String>> answerKeywords = answers.getAllAnswers();
-            for(Destination d : destinations) {
-                List<Value<String>> destinationKeywords = d.getKeywords();
-                for(Value<String> keyword : answerKeywords) {
-                    if(destinationKeywords.contains(keyword)) {
-                        newDestination = d;
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) break;
+        HashMap<Destination, Integer> countMap = new HashMap<>();
+
+        matchDestination(userAnswers, destinations, countMap);
+        
+        int max = 0;
+        for(Destination d : countMap.keySet()) {
+            if(countMap.get(d) > max) {
+                newDestination = d;
+                max = countMap.get(d);
             }
-            if (found) break;
         }
-
+    
+        System.err.println(newDestination.getName());
         // Convert the server stats to JSON
         String json = convertToJsonUsingGson(newDestination);
 
@@ -102,6 +112,23 @@ public class DestinationInfoServlet extends HttpServlet {
         response.getWriter().println(json);
     }
 
+    private void matchDestination(List<UserAnswers> userAnswers, List<Destination> destinations, HashMap<Destination, Integer> countMap) {
+
+        for (UserAnswers answers : userAnswers) {
+            List<String> answerKeywords = answers.getAllAnswers();
+            for(Destination d : destinations) {
+                List<String> destinationKeywords = d.getKeywords();
+            
+                for(String keyword : answerKeywords) {
+                    if(destinationKeywords.contains(keyword)) {
+                        int count = countMap.containsKey(d) ? countMap.get(d) : 0;
+                        countMap.put(d, ++count);
+                        return;
+                    }
+                }
+            }
+        }
+    }
     /**
     * Converts a ServerStats instance into a JSON string using the Gson library.
     */
