@@ -18,6 +18,7 @@ let quizIndex = 0;
 let responses = [];
 const QUIZ_ELEMENT_ID = "quiz";
 let resultObject;
+let userID;
 let results;
 let resultKeys;
 
@@ -36,14 +37,13 @@ let resultKeys;
 
 async function onLoad() {    
     quizObject = await fetch('/getQuizQuestions').then(a=>a.json());
-    quizKeys = Object.keys(quizObject.quiz);
-    
-    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    const question = quizKeys[0];
 
-    quiz.appendChild(createParagraphElement(question));
-    for (let a of quizObject.quiz[question]) {
-        let button = createButton(a);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    const question = quizObject[0];
+
+    quiz.appendChild(createParagraphElement(question.question));
+    for (let answer of question.answers) {
+        let button = createButton(answer);
         button.classList.add("nextButton");
         button.addEventListener("click", function() {
             onClick(this);
@@ -52,20 +52,19 @@ async function onLoad() {
     }
 }
 
-async function onClick(elm) {
-    
+function onClick(elm) {
     responses.push(elm.value);
     quizIndex = quizIndex + 1;
     clearElm(QUIZ_ELEMENT_ID);
 
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    const question = quizKeys[quizIndex];
+    const question = quizObject[quizIndex];
 
-    quiz.appendChild(createParagraphElement(question));
-    for (let a of quizObject.quiz[question]) {
-        let button = createButton(a);
+    quiz.appendChild(createParagraphElement(question.question));
+    for (let answer of question.answers) {
+        let button = createButton(answer);
         button.classList.add("nextButton");
-        if (quizIndex == quizKeys.length - 1) {            
+        if (quizIndex == quizObject.length - 1) {            
             button.addEventListener("click", function() {
                 saveMatch(this);
                 userResult(this);
@@ -79,12 +78,66 @@ async function onClick(elm) {
     }
 }
 
-function saveMatch(elm) {
+async function saveMatch(elm) {
     responses.push(elm.value);
+    userID = create_UUID();
     clearElm(QUIZ_ELEMENT_ID);
-    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement("Make redirect to destination match"));
-    quiz.appendChild(createParagraphElement(responses.toString()));
+
+    // const form = document.createElement('form');
+    // form.method = "post";
+    // form.target = "dummyframe";
+    // form.action = "/sendUserAnswers";
+
+    // const responsesInput = document.createElement('input');
+    // responsesInput.type = 'hidden';
+    // responsesInput.name = "responses";
+    // responsesInput.value = JSON.stringify(responses);
+
+    // const userIdInput = document.createElement('input');
+    // userIdInput.type = 'hidden';
+    // userIdInput.name = "userId";
+    // userIdInput.value = userID;
+
+    // form.appendChild(responsesInput);
+    // form.appendChild(userIdInput);
+
+    // document.body.appendChild(form);
+    // form.submit();
+
+    let jsonResponses = {
+      responses: responses,
+    }
+
+    //to sendUsers
+    var data = new FormData();
+    data.append('responses', JSON.stringify(jsonResponses));
+    data.append('userId', userID);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'sendUserAnswers');
+    xhr.send(data);
+
+    //to destinationInfo
+    var data = new FormData();
+    data.append('userId', userID);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'getDestinationInfo');
+    xhr.send(data);
+
+//     answersObject = await fetch('/sendUserAnswers',{
+//   method: 'POST', // or 'PUT'
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify(responses),
+// }).then(response => response.json())
+// .then(data => {
+//   console.log('Success:', data);
+// })
+// .catch((error) => {
+//   console.error('Error:', error);
+// });
 }
 /** Creates an <p> element containing text. */
 function createParagraphElement(text) {
@@ -106,6 +159,7 @@ function clearElm(elementID) {
 }
 
 
+
 function userResult() {
     clearElm(QUIZ_ELEMENT_ID);
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
@@ -113,10 +167,20 @@ function userResult() {
     displayResults(this);
 }
 
-async function displayResults() {
+function create_UUID(){
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+}
+
+ async function displayResults() {
     results = await fetch('/getDestinationInfo');
     resultKeys = await results.json();
-   
+    
     jsonPlaces = '{ "Places" : [' +
    '{ "Place":"Paris" , "Currency":"Euro","Language":"Parisian French","Price":"$$$","Food":["Caramels", "Baguette", "Pain Au chocolat", "Pastries", "Chocolate", "Macarons", "Cheese from Laurent Dubois", "Crème Brûlée ", "Éclair", "Croissants" ]},' +
         '{ "Place":"New York" , "Currency":"US Dollar","Language":"English","Price":"$$$","Food":["Pizza", "Bagels", "Burgers", "Sandwiches", "Ramen", "Food Trucks", "Cheesecake" ]},' +
@@ -125,16 +189,16 @@ async function displayResults() {
     resultObject = JSON.parse(jsonPlaces);
 
     var h = document.createElement("H3");
-    let i =2;
-    // Math.floor(Math.random() * 4);
+
+   // Math.floor(Math.random() * 4);
     h.appendChild(document.createTextNode(resultKeys.name));
     quiz.appendChild(h);
-    quiz.appendChild(createParagraphElement("Currency: "+resultObject.Places[i].Currency));
-    quiz.appendChild(createParagraphElement("Language: "+resultObject.Places[i].Language));
-    quiz.appendChild(createParagraphElement("Price: "+resultObject.Places[i].Price));
+    document.body.appendChild(createParagraphElement("Currency: "+resultKeys.currency));
+    quiz.appendChild(createParagraphElement("Language: "+resultKeys.language));
+    quiz.appendChild(createParagraphElement("Price: "+resultKeys.overallExpense));
     quiz.appendChild(createParagraphElement("Food to try: ")); 
-    for (var j = 0; j < resultObject.Places[i].Food.length; j++) {
-       quiz.appendChild(createParagraphElement(resultObject.Places[i].Food[j]));
+    for (var j = 0; j < resultKeys.food.length; j++) {
+       quiz.appendChild(createParagraphElement(resultKeys.food[j]));
     
     }
     
