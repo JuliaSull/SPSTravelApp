@@ -16,6 +16,7 @@ import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.Value;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,20 +24,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-/**
- * Handles requests sent to the /hello URL. Try running a server and navigating
- * to /hello!
- */
+
 @WebServlet("/getDestinationInfo")
+@MultipartConfig
 public class DestinationInfoServlet extends HttpServlet {
 
     static final long serialVersionUID = 0;
     private KeyFactory keyFactory;
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
-        String userID = request.getParameter("userID");
+        String userID = request.getParameter("userId");
+        System.err.println("/getDestinationInfo:" + userID);
 
         // get userAnswers from datastore
         Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
@@ -67,15 +67,18 @@ public class DestinationInfoServlet extends HttpServlet {
             String name = entity.getString("name");
             String overallExpense = entity.getString("overallExpense");
             String type = entity.getString("type");
+            String language = entity.getString("language");
+            String currency = entity.getString("currency");
             List<Value<String>> keywords = entity.getList("keywords");
+            List<Value<String>> food = entity.getList("food");
 
-            Destination destination = new Destination(name,overallExpense,type,keywords);
+            Destination destination = new Destination(name,overallExpense,type,language,currency,keywords,food);
             destinations.add(destination);
         }
 
         boolean found = false;
         // default hard-coded destination in case no destination is found
-        Destination newDestination = new Destination("Hawaii", "$$$", "beach");
+        Destination newDestination = new Destination("Hawaii", "$$$", "beach", "English","U.S. Dollar");
 
         //match responses with destination
         for (UserAnswers answers : userAnswers) {
