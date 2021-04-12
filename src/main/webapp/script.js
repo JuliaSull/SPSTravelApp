@@ -67,8 +67,7 @@ async function onClick(elm) {
         button.classList.add("nextButton");
         if (quizIndex == quizObject.length - 1) {            
             button.addEventListener("click", function() {
-                saveMatch(this);
-                userResult(this);
+              saveMatch(this);
             });
         } else {
             button.addEventListener("click", function() {
@@ -84,31 +83,6 @@ async function saveMatch(elm) {
     userID = create_UUID();
     clearElm(QUIZ_ELEMENT_ID);
 
-    // const form = document.createElement('form');
-    // form.method = "post";
-    // form.target = "dummyframe";
-    // form.action = "/sendUserAnswers";
-
-    // const responsesInput = document.createElement('input');
-    // responsesInput.type = 'hidden';
-    // responsesInput.name = "responses";
-    // responsesInput.value = JSON.stringify(responses);
-
-    // const userIdInput = document.createElement('input');
-    // userIdInput.type = 'hidden';
-    // userIdInput.name = "userId";
-    // userIdInput.value = userID;
-
-    // form.appendChild(responsesInput);
-    // form.appendChild(userIdInput);
-
-    // document.body.appendChild(form);
-    // form.submit();
-
-    let jsonResponses = {
-      responses: responses,
-    }
-
     //to sendUsers
     var data = new FormData();
     data.append('responses', JSON.stringify(jsonResponses));
@@ -116,8 +90,16 @@ async function saveMatch(elm) {
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'sendUserAnswers');
+    xhr.onload = function(event) {
+      displayUserResult(elm);
+    };
     xhr.send(data);
+}
 
+function displayUserResult() {
+    clearElm(QUIZ_ELEMENT_ID);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    
     //to destinationInfo
     var data = new FormData();
     data.append('userId', userID);
@@ -126,20 +108,10 @@ async function saveMatch(elm) {
     xhr.open('POST', 'getDestinationInfo');
     xhr.send(data);
 
-//     answersObject = await fetch('/sendUserAnswers',{
-//   method: 'POST', // or 'PUT'
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-//   body: JSON.stringify(responses),
-// }).then(response => response.json())
-// .then(data => {
-//   console.log('Success:', data);
-// })
-// .catch((error) => {
-//   console.error('Error:', error);
-// });
+    quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
+    displayResults(this);
 }
+
 /** Creates an <p> element containing text. */
 function createParagraphElement(text) {
     const pElement = document.createElement('p');
@@ -158,14 +130,6 @@ function createButton(text) {
 function clearElm(elementID) {
     document.getElementById(elementID).innerHTML = "";
 }
-
-function userResult() {
-    clearElm(QUIZ_ELEMENT_ID);
-    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
-    displayResults(this);
-}
-
 
 function create_UUID(){
     var dt = new Date().getTime();
