@@ -102,12 +102,21 @@ async function saveMatch(elm) {
     // document.body.appendChild(form);
     // form.submit();
 
+    //to sendUsers
     var data = new FormData();
     data.append('responses', JSON.stringify(responses));
     data.append('userId', userID);
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'sendUserAnswers');
+    xhr.send(data);
+
+    //to destinationInfo
+    var data = new FormData();
+    data.append('userId', userID);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'getDestinationInfo');
     xhr.send(data);
 
 //     answersObject = await fetch('/sendUserAnswers',{
