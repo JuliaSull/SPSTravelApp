@@ -37,22 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/sendUserAnswers")
 @MultipartConfig
 public class SendUserAnswersServlet extends HttpServlet {
-FindUserId
-    
-  static final long serialVersionUID = 0;
-
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
-    String answers = request.getParameter("responses");
-    
-    Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-
-    ListValue.Builder builder = ListValue.newBuilder();
-    //for (String str : answers) {
-        builder.addValue(answers);
-    //}
-=======
-
     static final long serialVersionUID = 0;
 
     @Override
@@ -71,8 +55,7 @@ FindUserId
                 builder.addValue(data.getString(i));
             } 
         } 
-
-main
+        
         // Save to datastore
         Key taskKey = datastore.newKeyFactory().setKind("UserAnswers").newKey(userId);
         Entity toSave = Entity.newBuilder(taskKey).set("AllAnswers", builder.build()).build();
