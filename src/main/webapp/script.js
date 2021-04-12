@@ -118,6 +118,7 @@ async function saveMatch(elm) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'getDestinationInfo');
     xhr.send(data);
+    xhr.onLoad()
 
 //     answersObject = await fetch('/sendUserAnswers',{
 //   method: 'POST', // or 'PUT'

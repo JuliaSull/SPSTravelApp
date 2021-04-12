@@ -34,33 +34,36 @@ public class DestinationInfoServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        
         String userID = request.getParameter("userId");
         System.err.println("/getDestinationInfo:" + userID);
 
         // get userAnswers from datastore
         Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-        Query<Entity> query = Query.newEntityQueryBuilder()
-        .setKind("UserAnswers")
-        .setFilter(PropertyFilter.gt("__key__", keyFactory.newKey(userID))).build();
-        QueryResults<Entity> results = datastore.run(query);
+        Query<Entity>query = Query.newEntityQueryBuilder()
+            .setKind("UserAnswers").build();
+        QueryResults<Entity>results = datastore.run(query);
 
-        List<UserAnswers> userAnswers = new ArrayList<>();
-        if(results.hasNext()) {
+        List < UserAnswers > userAnswers = new ArrayList<>();
+        while (results.hasNext()) {
             Entity entity = results.next();
-            long id = entity.getKey().getId();
-            List<Value<String>> allAnswers = entity.getList("AllAnswers");
+            if (it is the right one) {
+              long id = entity.getKey().getId();
+              List < Value < String >> allAnswers = entity.getList("AllAnswers");
 
-            UserAnswers answer = new UserAnswers(id, allAnswers);
-            userAnswers.add(answer);
+              UserAnswers answer = new UserAnswers(id, allAnswers);
+              userAnswers.add(answer);
+              break;
+            }
+            
         }
+        System.err.println("getDestinationInfo6");
 
 
         // get destination info from datastore
-        Query<Entity> destinationQuery = Query.newEntityQueryBuilder().setKind("Destinations").build();
-        QueryResults<Entity> destinationResults = datastore.run(destinationQuery);
+        Query < Entity > destinationQuery = Query.newEntityQueryBuilder().setKind("Destinations").build();
+        QueryResults < Entity > destinationResults = datastore.run(destinationQuery);
 
-        List<Destination> destinations = new ArrayList<>();
+        List < Destination > destinations = new ArrayList < > ();
         while (destinationResults.hasNext()) {
             Entity entity = destinationResults.next();
 
@@ -69,24 +72,24 @@ public class DestinationInfoServlet extends HttpServlet {
             String type = entity.getString("type");
             String language = entity.getString("language");
             String currency = entity.getString("currency");
-            List<Value<String>> keywords = entity.getList("keywords");
-            List<Value<String>> food = entity.getList("food");
+            List < Value < String >> keywords = entity.getList("keywords");
+            List < Value < String >> food = entity.getList("food");
 
-            Destination destination = new Destination(name,overallExpense,type,language,currency,keywords,food);
+            Destination destination = new Destination(name, overallExpense, type, language, currency, keywords, food);
             destinations.add(destination);
         }
 
         boolean found = false;
         // default hard-coded destination in case no destination is found
-        Destination newDestination = new Destination("Hawaii", "$$$", "beach", "English","U.S. Dollar");
+        Destination newDestination = new Destination("Hawaii", "$$$", "beach", "English", "U.S. Dollar");
 
         //match responses with destination
-        for (UserAnswers answers : userAnswers) {
-            List<Value<String>> answerKeywords = answers.getAllAnswers();
-            for(Destination d : destinations) {
-                List<Value<String>> destinationKeywords = d.getKeywords();
-                for(Value<String> keyword : answerKeywords) {
-                    if(destinationKeywords.contains(keyword)) {
+        for (UserAnswers answers: userAnswers) {
+            List < Value < String >> answerKeywords = answers.getAllAnswers();
+            for (Destination d: destinations) {
+                List < Value < String >> destinationKeywords = d.getKeywords();
+                for (Value < String > keyword: answerKeywords) {
+                    if (destinationKeywords.contains(keyword)) {
                         newDestination = d;
                         found = true;
                         break;
@@ -106,8 +109,8 @@ public class DestinationInfoServlet extends HttpServlet {
     }
 
     /**
-    * Converts a ServerStats instance into a JSON string using the Gson library.
-    */
+     * Converts a ServerStats instance into a JSON string using the Gson library.
+     */
     private String convertToJsonUsingGson(Destination obj) {
         Gson gson = new Gson();
         String json = gson.toJson(obj);
