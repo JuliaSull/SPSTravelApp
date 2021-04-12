@@ -82,7 +82,7 @@ async function saveMatch(elm) {
 
     //to sendUsers
     var data = new FormData();
-    data.append('responses', JSON.stringify(responses));
+    data.append('responses', JSON.stringify(jsonResponses));
     data.append('userId', userID);
 
     var xhr = new XMLHttpRequest();
