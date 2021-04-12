@@ -20,7 +20,7 @@ public final class UserAnswers {
   }
 
   public UserAnswers(List<Value<String>> allAnswers) {
-    this.id = 0l;
+    this.id = 0;
     String values = !allAnswers.isEmpty() ? allAnswers.get(0).get() : "[\"\"]";
     if(values.length()>1) values = values.substring(1, values.length()-1);
     values = values.replaceAll("[|]|\"","");
