@@ -15,6 +15,11 @@ public final class UserAnswers {
     this.allAnswers = allAnswers;
   }
 
+  public UserAnswers(List<Value<String>> allAnswers) {
+    this.id = 0l;
+    this.allAnswers = allAnswers;
+  }
+
   public List<Value<String>>getAllAnswers() {
     return this.allAnswers;
   }

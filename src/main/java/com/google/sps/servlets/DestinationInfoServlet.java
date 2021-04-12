@@ -41,18 +41,27 @@ public class DestinationInfoServlet extends HttpServlet {
         // get userAnswers from datastore
         Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
         Query<Entity> query = Query.newEntityQueryBuilder()
-        .setKind("UserAnswers")
-        .setFilter(PropertyFilter.gt("__key__", keyFactory.newKey(userID))).build();
+        .setKind("UserAnswers").build();
         QueryResults<Entity> results = datastore.run(query);
 
         List<UserAnswers> userAnswers = new ArrayList<>();
-        if(results.hasNext()) {
+        while(results.hasNext()) {
+            System.err.println("next");
             Entity entity = results.next();
-            long id = entity.getKey().getId();
-            List<Value<String>> allAnswers = entity.getList("AllAnswers");
 
-            UserAnswers answer = new UserAnswers(id, allAnswers);
-            userAnswers.add(answer);
+            System.err.println("key " + entity.getKey().getName());
+            System.err.println("user id " + userID);
+            System.err.println(userID);
+            
+            if(entity.getKey().getName().equals(userID)) {
+                System.err.println("match");
+                List<Value<String>> allAnswers = entity.getList("AllAnswers");
+                UserAnswers answer = new UserAnswers(allAnswers);
+                userAnswers.add(answer);
+                System.err.println("final");
+                break;
+            }
+            
         }
 
 

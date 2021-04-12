@@ -111,13 +111,6 @@ async function saveMatch(elm) {
     xhr.open('POST', 'sendUserAnswers');
     xhr.send(data);
 
-    //to destinationInfo
-    var data = new FormData();
-    data.append('userId', userID);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'getDestinationInfo');
-    xhr.send(data);
 
 //     answersObject = await fetch('/sendUserAnswers',{
 //   method: 'POST', // or 'PUT'
@@ -157,6 +150,15 @@ function clearElm(elementID) {
 function userResult() {
     clearElm(QUIZ_ELEMENT_ID);
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    
+    //to destinationInfo
+    var data = new FormData();
+    data.append('userId', userID);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'getDestinationInfo');
+    xhr.send(data);
+
     quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
     displayResults(this);
 }
