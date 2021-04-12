@@ -5,46 +5,64 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
+
+import com.google.cloud.datastore.Datastore;
+import com.google.cloud.datastore.DatastoreOptions;
+import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.Query;
+import com.google.cloud.datastore.QueryResults;
 
 import com.google.gson.Gson;
 
-/** Handles requests sent to the /getQuizQuestions URL. Try running a server and navigating to /getQuizQuestions! */
+import java.util.List;
+import java.util.ArrayList;
+
+/**
+ * Handles requests sent to the /getQuizQuestions URL. Try running a server and
+ * navigating to /getQuizQuestions!
+ */
 @WebServlet("/getQuizQuestions")
 public class QuizQuestionsServlet extends HttpServlet {
 
     static final long serialVersionUID = 0;
-    class QuizQuestion {
-        HashMap < String, List < String >> quiz = new HashMap < > ();
 
-        public QuizQuestion() {
-            quiz.put("Which of these would you most like to do?", List.of("Go on a hike in nature", "Take a trip downtown", "Go to a museum", "Take a day for relaxation"));
-            quiz.put("What is your favorite food?", List.of("Fruit", "Burgers", "Wraps", "Steak"));
-            quiz.put("How active do you like to be?", List.of("Very much", "Much", "Not much", "Not at all"));
-            quiz.put("What do you value most?", List.of("Learning new thigs", "Physical activity", "Beautiful scenery", "New experiences"));
-            quiz.put("How long will your trip be?", List.of("2+ weeks", "1 week", "Less than a week", "One day"));
-            quiz.put("How much are you willing to spend?", List.of("$$$$", "$$$", "$$", "$"));
-            quiz.put("Will you bring children? If so, how many?", List.of("No", "1", "2-4", "4+"));
-
-        }
+    class Question {
+      public String question;
+      public List<String> answers;
     }
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        QuizQuestion quest = new QuizQuestion();
+        // Create Datastore object and query questions
+        Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
-        // Convert the quiz question to JSON
-        String json = convertToJsonUsingGson(quest);
+        Query<Entity> query = Query.newEntityQueryBuilder().setKind("Questions").build();
+        QueryResults<Entity> questions = datastore.run(query);
 
+        List<Question> questionsForJson = new ArrayList<>();
+        while (questions.hasNext()) {
+            Entity question = questions.next();
+
+            Question questObj = new Question();
+            questObj.question = question.getString("QuestionText");
+            questObj.answers = List.of(
+              question.getString("Answer1"),
+              question.getString("Answer2"),
+              question.getString("Answer3"),
+              question.getString("Answer4")
+            );
+
+            questionsForJson.add(questObj);
+        }
+        String json = convertToJsonUsingGson(questionsForJson);
         // Send the JSON as the response
         response.setContentType("application/json;");
         response.getWriter().println(json);
     }
 
-    /**
-     * Converts a QuizQuestions instance into a JSON string using the Gson library.
-     */
-    private String convertToJsonUsingGson(QuizQuestion quest) {
-        return new Gson().toJson(quest);
+    private String convertToJsonUsingGson(List<Question> q) {
+        Gson gson = new Gson();
+        String json = gson.toJson(q);
+        return json;
     }
 }
