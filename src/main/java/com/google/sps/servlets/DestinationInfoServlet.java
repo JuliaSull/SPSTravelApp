@@ -2,6 +2,7 @@ package com.google.sps.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.google.sps.data.Destination;
@@ -30,7 +31,6 @@ import com.google.gson.Gson;
 public class DestinationInfoServlet extends HttpServlet {
 
     static final long serialVersionUID = 0;
-    private KeyFactory keyFactory;
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -88,27 +88,22 @@ public class DestinationInfoServlet extends HttpServlet {
             destinations.add(destination);
         }
 
-        boolean found = false;
         // default hard-coded destination in case no destination is found
         Destination newDestination = new Destination("Hawaii", "$$$", "beach", "English","U.S. Dollar");
 
-        //match responses with destination
-        for (UserAnswers answers : userAnswers) {
-            List<Value<String>> answerKeywords = answers.getAllAnswers();
-            for(Destination d : destinations) {
-                List<Value<String>> destinationKeywords = d.getKeywords();
-                for(Value<String> keyword : answerKeywords) {
-                    if(destinationKeywords.contains(keyword)) {
-                        newDestination = d;
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) break;
-            }
-            if (found) break;
-        }
+        HashMap<Destination, Integer> countMap = new HashMap<>();
 
+        matchDestination(userAnswers, destinations, countMap);
+        
+        int max = 0;
+        for(Destination d : countMap.keySet()) {
+            if(countMap.get(d) > max) {
+                newDestination = d;
+                max = countMap.get(d);
+            }
+        }
+    
+        System.err.println(newDestination.getName());
         // Convert the server stats to JSON
         String json = convertToJsonUsingGson(newDestination);
 
@@ -117,6 +112,23 @@ public class DestinationInfoServlet extends HttpServlet {
         response.getWriter().println(json);
     }
 
+    private void matchDestination(List<UserAnswers> userAnswers, List<Destination> destinations, HashMap<Destination, Integer> countMap) {
+
+        for (UserAnswers answers : userAnswers) {
+            List<String> answerKeywords = answers.getAllAnswers();
+            for(Destination d : destinations) {
+                List<String> destinationKeywords = d.getKeywords();
+            
+                for(String keyword : answerKeywords) {
+                    if(destinationKeywords.contains(keyword)) {
+                        int count = countMap.containsKey(d) ? countMap.get(d) : 0;
+                        countMap.put(d, ++count);
+                        return;
+                    }
+                }
+            }
+        }
+    }
     /**
     * Converts a ServerStats instance into a JSON string using the Gson library.
     */

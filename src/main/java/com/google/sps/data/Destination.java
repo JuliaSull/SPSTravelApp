@@ -13,7 +13,7 @@ public final class Destination {
   private final String type;
   private final String language;
   private final String currency;
-  private final List<Value<String>> keywords;
+  private final List<String> keywords;
   private final List<Value<String>> food;
 
   public Destination(String name, String overallExpense, String type, String language, String currency, List<Value<String>> keywords, List<Value<String>> food) {
@@ -23,7 +23,11 @@ public final class Destination {
     this.language = language;
     this.currency = currency;
     this.food = food;
-    this.keywords = keywords;
+    List<String> stringKeywords = new ArrayList<>();
+    for(Value<String> k : keywords) {
+        stringKeywords.add(k.get());
+    }
+    this.keywords = stringKeywords;
   }
 
   public Destination(String name, String overallExpense, String type, String language, String currency, List<Value<String>> food) {
@@ -46,7 +50,7 @@ public final class Destination {
     this.keywords = new ArrayList<>();
   }
 
-  public List<Value<String>> getKeywords() {
+  public List<String> getKeywords() {
       return this.keywords;
   }
 
