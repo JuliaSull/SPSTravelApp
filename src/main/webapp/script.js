@@ -18,6 +18,8 @@ let quizIndex = 0;
 let responses = [];
 const QUIZ_ELEMENT_ID = "quiz";
 let resultObject;
+let results;
+let resultKeys;
 let userID;
 
 // What should be fetched from /getQuizQuestion
@@ -80,6 +82,10 @@ async function saveMatch(elm) {
     userID = create_UUID();
     clearElm(QUIZ_ELEMENT_ID);
 
+    let jsonResponses = {
+      responses: responses,
+    };
+
     //to sendUsers
     var data = new FormData();
     data.append('responses', JSON.stringify(jsonResponses));
@@ -94,9 +100,6 @@ async function saveMatch(elm) {
 }
 
 function displayUserResult() {
-    clearElm(QUIZ_ELEMENT_ID);
-    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    
     //to destinationInfo
     var data = new FormData();
     data.append('userId', userID);
@@ -104,9 +107,12 @@ function displayUserResult() {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'getDestinationInfo');
     xhr.send(data);
-
-    quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
-    displayResults(this);
+    xhr.onload = function(event) {
+      clearElm(QUIZ_ELEMENT_ID);
+      const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+      quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
+      displayResults(xhr.response);
+    };
 }
 
 /** Creates an <p> element containing text. */
@@ -128,6 +134,15 @@ function clearElm(elementID) {
     document.getElementById(elementID).innerHTML = "";
 }
 
+
+
+function userResult() {
+    clearElm(QUIZ_ELEMENT_ID);
+    const quiz = document.getElementById(QUIZ_ELEMENT_ID);
+    quiz.appendChild(createParagraphElement("Based On Your Results, You Should visit..."));
+    displayResults(this);
+}
+
 function create_UUID(){
     var dt = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -138,23 +153,25 @@ function create_UUID(){
     return uuid;
 }
 
-function displayResults() {
-    jsonPlaces = '{ "Places" : [' +
-   '{ "Place":"Paris" , "Currency":"Euro","Language":"Parisian French","Price":"$$$","Food":["Caramels", "Baguette", "Pain Au chocolat", "Pastries", "Chocolate", "Macarons", "Cheese from Laurent Dubois", "Crème Brûlée ", "Éclair", "Croissants" ]},' +
-        '{ "Place":"New York" , "Currency":"US Dollar","Language":"English","Price":"$$$","Food":["Pizza", "Bagels", "Burgers", "Sandwiches", "Ramen", "Food Trucks", "Cheesecake" ]},' +
-        '{ "Place":"Hawaii" , "Currency":"US Dollar","Language":"English, Creole, and Hawaiian Pidgin","Price":"$$","Food":["All-Natural Shave Ice", "Saimin", "Poke", "Luau Stew", "Manapua", "Fish Tacos", "Huli Huli Chicken", "Loco Moco", "Malasadas"]},' +
-        '{ "Place":"Cape Town" , "Currency":"South African Rand","Language":"Afrikaans","Price":"$","Food":["Fish and Chips", "Game Meat", "Gatsby", "Bunny Chow","Bobotie", "Biltong and Droëwors", "Malva Pudding" , "Koeksister"] } ]}';
-    resultObject = JSON.parse(jsonPlaces);
+async function displayResults(placeJsonData) {
+
+  //   jsonPlaces = '{ "Places" : [' +
+  //  '{ "Place":"Paris" , "Currency":"Euro","Language":"Parisian French","Price":"$$$","Food":["Caramels", "Baguette", "Pain Au chocolat", "Pastries", "Chocolate", "Macarons", "Cheese from Laurent Dubois", "Crème Brûlée ", "Éclair", "Croissants" ]},' +
+  //       '{ "Place":"New York" , "Currency":"US Dollar","Language":"English","Price":"$$$","Food":["Pizza", "Bagels", "Burgers", "Sandwiches", "Ramen", "Food Trucks", "Cheesecake" ]},' +
+  //       '{ "Place":"Hawaii" , "Currency":"US Dollar","Language":"English, Creole, and Hawaiian Pidgin","Price":"$$","Food":["All-Natural Shave Ice", "Saimin", "Poke", "Luau Stew", "Manapua", "Fish Tacos", "Huli Huli Chicken", "Loco Moco", "Malasadas"]},' +
+  //       '{ "Place":"Cape Town" , "Currency":"South African Rand","Language":"Afrikaans","Price":"$","Food":["Fish and Chips", "Game Meat", "Gatsby", "Bunny Chow","Bobotie", "Biltong and Droëwors", "Malva Pudding" , "Koeksister"] } ]}';
+    resultObject = JSON.parse(placeJsonData);
+    //alert(placeJsonData)
     var h = document.createElement("H3");
-    let i = Math.floor(Math.random() * 4);
-    h.appendChild(document.createTextNode(resultObject.Places[i].Place));
+    let i = 2;
+    h.appendChild(document.createTextNode(resultObject.name));
     document.body.appendChild(h);
-    document.body.appendChild(createParagraphElement("Currency: "+resultObject.Places[i].Currency));
-    document.body.appendChild(createParagraphElement("Language: "+resultObject.Places[i].Language));
-    document.body.appendChild(createParagraphElement("Price: "+resultObject.Places[i].Price));
+    document.body.appendChild(createParagraphElement("Currency: "+resultObject.currency));
+    document.body.appendChild(createParagraphElement("Language: "+resultObject.language));
+    document.body.appendChild(createParagraphElement("Price: "+resultObject.overallExpense));
     document.body.appendChild(createParagraphElement("Food to try: ")); 
-    for (var j = 0; j < resultObject.Places[i].Food.length; j++) {
-        document.body.appendChild(createParagraphElement(resultObject.Places[i].Food[j]));
+    for (var j = 0; j < esultObject.food.length; j++) {
+       quiz.appendChild(createParagraphElement(resultObject.food[j]));
     
     }
     
