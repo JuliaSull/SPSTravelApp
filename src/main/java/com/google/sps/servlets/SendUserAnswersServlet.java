@@ -23,21 +23,25 @@ import com.google.cloud.datastore.ListValue;
 import java.io.IOException;
 
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Enumeration;
 
 /** Servlet responsible for creating new tasks. */
 @WebServlet("/sendUserAnswers")
+@MultipartConfig
 public class SendUserAnswersServlet extends HttpServlet {
     
   static final long serialVersionUID = 0;
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
-   
     String answers = request.getParameter("responses");
-   
+    
+    System.err.println(answers);
+    System.err.println(request.getParameter("userId"));
     Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     ListValue.Builder builder = ListValue.newBuilder();
@@ -47,7 +51,7 @@ public class SendUserAnswersServlet extends HttpServlet {
         // Save to datastore
     Key taskKey = datastore.newKeyFactory()
         .setKind("UserAnswers")
-        .newKey("SomeUUIDFromJavaScript");
+        .newKey(request.getParameter("userId"));
     Entity toSave = Entity.newBuilder(taskKey).set("AllAnswers", builder.build()).build();
        
     datastore.put(toSave);

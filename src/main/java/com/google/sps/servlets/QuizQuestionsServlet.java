@@ -14,8 +14,6 @@ import com.google.cloud.datastore.QueryResults;
 
 import com.google.gson.Gson;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 

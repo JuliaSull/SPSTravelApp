@@ -56,13 +56,13 @@ function onClick(elm) {
     clearElm(QUIZ_ELEMENT_ID);
 
     const quiz = document.getElementById(QUIZ_ELEMENT_ID);
-    const question = quizKeys[quizIndex];
+    const question = quizObject[quizIndex];
 
-    quiz.appendChild(createParagraphElement(question));
-    for (let a of quizObject.quiz[question]) {
-        let button = createButton(a);
+    quiz.appendChild(createParagraphElement(question.question));
+    for (let answer of question.answers) {
+        let button = createButton(answer);
         button.classList.add("nextButton");
-        if (quizIndex == quizKeys.length - 1) {            
+        if (quizIndex == quizObject.length - 1) {            
             button.addEventListener("click", function() {
                 saveMatch(this);
                 userResult(this);
@@ -80,21 +80,44 @@ async function saveMatch(elm) {
     responses.push(elm.value);
     userID = create_UUID();
     clearElm(QUIZ_ELEMENT_ID);
-    const form = document.createElement('form');
-    form.method = "post";
-    form.action = "/sendUserAnswers";
 
-    const hiddenField = document.createElement('input');
-    hiddenField.type = 'hidden';
-    hiddenField.name = "responses";
-    hiddenField.value = JSON.stringify(responses);
-    hiddenField.value = userID;
+    // const form = document.createElement('form');
+    // form.method = "post";
+    // form.target = "dummyframe";
+    // form.action = "/sendUserAnswers";
 
-    form.appendChild(hiddenField);
+    // const responsesInput = document.createElement('input');
+    // responsesInput.type = 'hidden';
+    // responsesInput.name = "responses";
+    // responsesInput.value = JSON.stringify(responses);
 
-    document.body.appendChild(form);
-    alert("Sent the stuff");
-    form.submit();
+    // const userIdInput = document.createElement('input');
+    // userIdInput.type = 'hidden';
+    // userIdInput.name = "userId";
+    // userIdInput.value = userID;
+
+    // form.appendChild(responsesInput);
+    // form.appendChild(userIdInput);
+
+    // document.body.appendChild(form);
+    // form.submit();
+
+    //to sendUsers
+    var data = new FormData();
+    data.append('responses', JSON.stringify(responses));
+    data.append('userId', userID);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'sendUserAnswers');
+    xhr.send(data);
+
+    //to destinationInfo
+    var data = new FormData();
+    data.append('userId', userID);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'getDestinationInfo');
+    xhr.send(data);
 
 //     answersObject = await fetch('/sendUserAnswers',{
 //   method: 'POST', // or 'PUT'
