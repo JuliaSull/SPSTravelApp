@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/sendUserAnswers")
 @MultipartConfig
 public class SendUserAnswersServlet extends HttpServlet {
-
     static final long serialVersionUID = 0;
 
     @Override
@@ -56,7 +55,7 @@ public class SendUserAnswersServlet extends HttpServlet {
                 builder.addValue(data.getString(i));
             } 
         } 
-
+        
         // Save to datastore
         Key taskKey = datastore.newKeyFactory().setKind("UserAnswers").newKey(userId);
         Entity toSave = Entity.newBuilder(taskKey).set("AllAnswers", builder.build()).build();
