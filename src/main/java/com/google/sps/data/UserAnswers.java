@@ -2,6 +2,7 @@ package com.google.sps.data;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 import com.google.cloud.datastore.Value;
 
@@ -21,11 +22,10 @@ public final class UserAnswers {
 
   public UserAnswers(List<Value<String>> allAnswers) {
     this.id = 0;
-    String values = !allAnswers.isEmpty() ? allAnswers.get(0).get() : "[\"\"]";
-    if(values.length()>1) values = values.substring(1, values.length()-1);
-    values = values.replaceAll("[|]|\"","");
-    List<String> allAnswersList= Arrays.asList(values.split(","));
-    this.allAnswers = allAnswersList;
+    this.allAnswers = new ArrayList<String>();
+    for (Value<String> answer : allAnswers) {
+      this.allAnswers.add(answer.get());
+    }
   }
 
   public List<String> getAllAnswers() {

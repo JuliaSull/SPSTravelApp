@@ -47,7 +47,6 @@ public class DestinationInfoServlet extends HttpServlet {
         List<UserAnswers> userAnswers = new ArrayList<>();
         while(results.hasNext()) {
             Entity entity = results.next();
-            
             if (entity.getKey().getName().equals(userID)) {
                 List<Value<String>> allAnswers = entity.getList("AllAnswers");
                 UserAnswers answer = new UserAnswers(allAnswers);
@@ -74,6 +73,7 @@ public class DestinationInfoServlet extends HttpServlet {
 
         List<Destination> destinations = new ArrayList<>();
         while (destinationResults.hasNext()) {
+           
             Entity entity = destinationResults.next();
 
             String name = entity.getString("name");
@@ -83,7 +83,7 @@ public class DestinationInfoServlet extends HttpServlet {
             String currency = entity.getString("currency");
             List<Value<String>> keywords = entity.getList("keywords");
             List<Value<String>> food = entity.getList("food");
-
+            
             Destination destination = new Destination(name,overallExpense,type,language,currency,keywords,food);
             destinations.add(destination);
         }
@@ -113,17 +113,12 @@ public class DestinationInfoServlet extends HttpServlet {
     }
 
     private void matchDestination(List<UserAnswers> userAnswers, List<Destination> destinations, HashMap<Destination, Integer> countMap) {
-
         for (UserAnswers answers : userAnswers) {
-            List<String> answerKeywords = answers.getAllAnswers();
             for(Destination d : destinations) {
-                List<String> destinationKeywords = d.getKeywords();
-            
-                for(String keyword : answerKeywords) {
-                    if(destinationKeywords.contains(keyword)) {
+                for(String keyword : answers.getAllAnswers()) {
+                    if(d.getKeywords().contains(keyword)) {
                         int count = countMap.containsKey(d) ? countMap.get(d) : 0;
                         countMap.put(d, ++count);
-                        return;
                     }
                 }
             }
