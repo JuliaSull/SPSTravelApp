@@ -14,7 +14,7 @@ public final class Destination {
   private final String language;
   private final String currency;
   private final List<String> keywords;
-  private final List<Value<String>> food;
+  private final List<String> food;
 
   public Destination(String name, String overallExpense, String type, String language, String currency, List<Value<String>> keywords, List<Value<String>> food) {
     this.name = name;
@@ -22,7 +22,11 @@ public final class Destination {
     this.type = type;
     this.language = language;
     this.currency = currency;
-    this.food = food;
+    this.food = new ArrayList<>();
+    for (Value<String> foodStr : food) {
+      this.food.add(foodStr.get());
+    }
+
     List<String> stringKeywords = new ArrayList<>();
     for(Value<String> k : keywords) {
         stringKeywords.add(k.get());
@@ -36,7 +40,10 @@ public final class Destination {
     this.type = type;
     this.language = language;
     this.currency = currency;
-    this.food = food;
+    this.food = new ArrayList<>();
+    for (Value<String> foodStr : food) {
+      this.food.add(foodStr.get());
+    }
     this.keywords = new ArrayList<>();
   }
 
@@ -54,7 +61,7 @@ public final class Destination {
       return this.keywords;
   }
 
-  public List<Value<String>> getFood() {
+  public List<String> getFood() {
       return this.food;
   }
 

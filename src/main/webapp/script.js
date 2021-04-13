@@ -161,7 +161,6 @@ async function displayResults(placeJsonData) {
   //       '{ "Place":"Hawaii" , "Currency":"US Dollar","Language":"English, Creole, and Hawaiian Pidgin","Price":"$$","Food":["All-Natural Shave Ice", "Saimin", "Poke", "Luau Stew", "Manapua", "Fish Tacos", "Huli Huli Chicken", "Loco Moco", "Malasadas"]},' +
   //       '{ "Place":"Cape Town" , "Currency":"South African Rand","Language":"Afrikaans","Price":"$","Food":["Fish and Chips", "Game Meat", "Gatsby", "Bunny Chow","Bobotie", "Biltong and Droëwors", "Malva Pudding" , "Koeksister"] } ]}';
     resultObject = JSON.parse(placeJsonData);
-    //alert(placeJsonData)
     var h = document.createElement("H3");
     let i = 2;
     h.appendChild(document.createTextNode(resultObject.name));
@@ -170,8 +169,8 @@ async function displayResults(placeJsonData) {
     document.body.appendChild(createParagraphElement("Language: "+resultObject.language));
     document.body.appendChild(createParagraphElement("Price: "+resultObject.overallExpense));
     document.body.appendChild(createParagraphElement("Food to try: ")); 
-    for (var j = 0; j < esultObject.food.length; j++) {
-       quiz.appendChild(createParagraphElement(resultObject.food[j]));
+    for (var j = 0; j < resultObject.food.length; j++) {
+       document.body.appendChild(createParagraphElement(resultObject.food[j]));
     
     }
     
